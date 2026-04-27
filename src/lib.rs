@@ -3,178 +3,172 @@ use anchor_lang::prelude::*;
 declare_id!("Z6eb7skqS5xQtBetsEspnJNfaVjkiVxfbE8awGegfDh");
 
 #[program]
-pub mod refaccionaria {
+pub mod motocicletas {
     use super::*;
 
-    // Crear refaccionaria
-    pub fn crear_refaccionaria(ctx: Context<NuevaRefaccionaria>, nombre: String) -> Result<()> {
+    pub fn crear_agencia(ctx: Context<NuevaAgencia>, nombre: String) -> Result<()> {
         let owner = ctx.accounts.owner.key();
 
-        ctx.accounts.refaccionaria.set_inner(Refaccionaria {
+        ctx.accounts.agencia.set_inner(Agencia {
             owner,
             nombre,
-            refacciones: Vec::new(),
+            motos: Vec::new(),
         });
 
         Ok(())
     }
 
-    // Agregar refacción
-    pub fn agregar_refaccion(
-        ctx: Context<NuevaRefaccion>,
-        nombre: String,
+    pub fn agregar_moto(
+        ctx: Context<NuevaMoto>,
+        modelo: String,
+        marca: String,
         precio: u32,
         stock: u16,
     ) -> Result<()> {
         require!(
-            ctx.accounts.refaccionaria.owner == ctx.accounts.owner.key(),
+            ctx.accounts.agencia.owner == ctx.accounts.owner.key(),
             Errores::NoEresElOwner
         );
 
-        let refaccion = Refaccion {
-            nombre,
+        let moto = Moto {
+            modelo,
+            marca,
             precio,
             stock,
-            activo: true,
+            disponible: true,
         };
 
-        ctx.accounts.refaccionaria.refacciones.push(refaccion);
+        ctx.accounts.agencia.motos.push(moto);
 
         Ok(())
     }
 
-    // Eliminar refacción
-    pub fn eliminar_refaccion(ctx: Context<NuevaRefaccion>, nombre: String) -> Result<()> {
+    pub fn eliminar_moto(ctx: Context<NuevaMoto>, modelo: String) -> Result<()> {
         require!(
-            ctx.accounts.refaccionaria.owner == ctx.accounts.owner.key(),
+            ctx.accounts.agencia.owner == ctx.accounts.owner.key(),
             Errores::NoEresElOwner
         );
 
-        let refacciones = &mut ctx.accounts.refaccionaria.refacciones;
+        let motos = &mut ctx.accounts.agencia.motos;
 
-        for i in 0..refacciones.len() {
-            if refacciones[i].nombre == nombre {
-                refacciones.remove(i);
+        for i in 0..motos.len() {
+            if motos[i].modelo == modelo {
+                motos.remove(i);
                 return Ok(());
             }
         }
 
-        Err(Errores::RefaccionNoExiste.into())
+        Err(Errores::MotoNoExiste.into())
     }
 
-    // Actualizar stock
     pub fn actualizar_stock(
-        ctx: Context<NuevaRefaccion>,
-        nombre: String,
+        ctx: Context<NuevaMoto>,
+        modelo: String,
         nuevo_stock: u16,
     ) -> Result<()> {
         require!(
-            ctx.accounts.refaccionaria.owner == ctx.accounts.owner.key(),
+            ctx.accounts.agencia.owner == ctx.accounts.owner.key(),
             Errores::NoEresElOwner
         );
 
-        let refacciones = &mut ctx.accounts.refaccionaria.refacciones;
+        let motos = &mut ctx.accounts.agencia.motos;
 
-        for r in refacciones.iter_mut() {
-            if r.nombre == nombre {
-                r.stock = nuevo_stock;
+        for m in motos.iter_mut() {
+            if m.modelo == modelo {
+                m.stock = nuevo_stock;
                 return Ok(());
             }
         }
 
-        Err(Errores::RefaccionNoExiste.into())
+        Err(Errores::MotoNoExiste.into())
     }
 
-    // Activar / desactivar refacción
-    pub fn alternar_estado(ctx: Context<NuevaRefaccion>, nombre: String) -> Result<()> {
+    pub fn alternar_estado(ctx: Context<NuevaMoto>, modelo: String) -> Result<()> {
         require!(
-            ctx.accounts.refaccionaria.owner == ctx.accounts.owner.key(),
+            ctx.accounts.agencia.owner == ctx.accounts.owner.key(),
             Errores::NoEresElOwner
         );
 
-        let refacciones = &mut ctx.accounts.refaccionaria.refacciones;
+        let motos = &mut ctx.accounts.agencia.motos;
 
-        for r in refacciones.iter_mut() {
-            if r.nombre == nombre {
-                r.activo = !r.activo;
+        for m in motos.iter_mut() {
+            if m.modelo == modelo {
+                m.disponible = !m.disponible;
                 return Ok(());
             }
         }
 
-        Err(Errores::RefaccionNoExiste.into())
+        Err(Errores::MotoNoExiste.into())
     }
 
-    // Ver refacciones (log)
-    pub fn ver_refacciones(ctx: Context<NuevaRefaccion>) -> Result<()> {
+    pub fn ver_motos(ctx: Context<NuevaMoto>) -> Result<()> {
         require!(
-            ctx.accounts.refaccionaria.owner == ctx.accounts.owner.key(),
+            ctx.accounts.agencia.owner == ctx.accounts.owner.key(),
             Errores::NoEresElOwner
         );
 
-        msg!("Refacciones: {:#?}", ctx.accounts.refaccionaria.refacciones);
+        msg!("Motos: {:#?}", ctx.accounts.agencia.motos);
         Ok(())
     }
 }
 
-// ERRORES
 #[error_code]
 pub enum Errores {
     #[msg("No eres el propietario")]
     NoEresElOwner,
 
-    #[msg("La refaccion no existe")]
-    RefaccionNoExiste,
+    #[msg("La motocicleta no existe")]
+    MotoNoExiste,
 }
 
-// CUENTA PRINCIPAL
 #[account]
 #[derive(InitSpace)]
-pub struct Refaccionaria {
+pub struct Agencia {
     owner: Pubkey,
 
     #[max_len(60)]
     nombre: String,
 
     #[max_len(20)]
-    refacciones: Vec<Refaccion>,
+    motos: Vec<Moto>,
 }
 
-// STRUCT INTERNO
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, InitSpace, PartialEq, Debug)]
-pub struct Refaccion {
+pub struct Moto {
     #[max_len(60)]
-    nombre: String,
+    modelo: String,
+
+    #[max_len(60)]
+    marca: String,
 
     precio: u32,
 
     stock: u16,
 
-    activo: bool,
+    disponible: bool,
 }
 
-// CONTEXTO CREAR
 #[derive(Accounts)]
-pub struct NuevaRefaccionaria<'info> {
+pub struct NuevaAgencia<'info> {
     #[account(mut)]
     pub owner: Signer<'info>,
 
     #[account(
         init,
         payer = owner,
-        space = Refaccionaria::INIT_SPACE + 8,
-        seeds = [b"refaccionaria", owner.key().as_ref()],
+        space = Agencia::INIT_SPACE + 8,
+        seeds = [b"agencia", owner.key().as_ref()],
         bump
     )]
-    pub refaccionaria: Account<'info, Refaccionaria>,
+    pub agencia: Account<'info, Agencia>,
 
     pub system_program: Program<'info, System>,
 }
 
-// CONTEXTO CRUD
 #[derive(Accounts)]
-pub struct NuevaRefaccion<'info> {
+pub struct NuevaMoto<'info> {
     pub owner: Signer<'info>,
 
     #[account(mut)]
-    pub refaccionaria: Account<'info, Refaccionaria>,
+    pub agencia: Account<'info, Agencia>,
 }

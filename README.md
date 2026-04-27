@@ -1,66 +1,37 @@
-# Refaccionaria en Solana
+# Agencia de Motocicletas en Solana
 
 Aplicación descentralizada desarrollada en Solana utilizando Rust y Anchor.
 
 ## Descripción
 
-Este proyecto permite gestionar una refaccionaria automotriz mediante operaciones CRUD almacenadas en la blockchain.
+Este proyecto permite gestionar una agencia de motocicletas mediante operaciones CRUD almacenadas en la blockchain.
 
-Se pueden registrar refacciones con los siguientes datos:
+Se pueden registrar motocicletas con los siguientes datos:
 
-* Nombre
-* Precio
-* Stock
-* Estado (activo o inactivo)
-
-La información se almacena utilizando Program Derived Addresses (PDA), lo que permite manejar cuentas seguras sin necesidad de llaves privadas adicionales.
+- Modelo
+- Marca
+- Precio
+- Stock
+- Estado (disponible o no disponible)
 
 ## Funcionalidades
 
-* Crear refaccionaria
-* Agregar refacciones
-* Eliminar refacciones
-* Actualizar stock
-* Activar o desactivar refacciones
-* Consultar inventario
+- Crear agencia
+- Agregar motocicletas
+- Eliminar motocicletas
+- Actualizar stock
+- Activar o desactivar disponibilidad
+- Consultar inventario
 
 ## Tecnologías
 
-* Rust
-* Anchor
-* Solana
+- Rust
+- Anchor
+- Solana
 
-## Ejecución del proyecto
-
-1. Clonar el repositorio
-
-```bash
-git clone https://github.com/TU_USUARIO/TU_REPO.git
-cd TU_REPO
-```
-
-2. Compilar el programa
+## Ejecución
 
 ```bash
 anchor build
-```
-
-3. Desplegar el programa
-
-```bash
 anchor deploy
-```
-
-4. Ejecutar pruebas
-
-```bash
 anchor test
-```
-
-## Ejemplo de uso
-
-Se crea una refaccionaria y se agregan refacciones con su precio y cantidad disponible. Posteriormente se pueden actualizar los datos, eliminar registros o consultar el estado del inventario.
-
-## Autor
-
-Proyecto desarrollado como parte del proceso de certificación en Solana.

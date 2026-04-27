@@ -1,56 +1,40 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 
-describe("Refaccionaria", () => {
+describe("Motocicletas", () => {
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
 
-  const program = anchor.workspace.Refaccionaria as Program;
+  const program = anchor.workspace.Motocicletas as Program;
 
   const [pda] = anchor.web3.PublicKey.findProgramAddressSync(
-    [Buffer.from("refaccionaria"), provider.wallet.publicKey.toBuffer()],
+    [Buffer.from("agencia"), provider.wallet.publicKey.toBuffer()],
     program.programId
   );
 
-  it("Crear refaccionaria", async () => {
+  it("Crear agencia", async () => {
     await program.methods
-      .crearRefaccionaria("Refaccionaria Lopez")
+      .crearAgencia("Agencia Motos")
       .accounts({
         owner: provider.wallet.publicKey,
-        refaccionaria: pda,
+        agencia: pda,
         systemProgram: anchor.web3.SystemProgram.programId,
       })
       .rpc();
-
-    console.log("Refaccionaria creada");
   });
 
-  it("Agregar refaccion", async () => {
+  it("Agregar moto", async () => {
     await program.methods
-      .agregarRefaccion("Filtro de aceite", 200, 10)
+      .agregarMoto("R15", "Yamaha", 50000, 5)
       .accounts({
         owner: provider.wallet.publicKey,
-        refaccionaria: pda,
+        agencia: pda,
       })
       .rpc();
-
-    console.log("Refaccion agregada");
   });
 
-  it("Actualizar stock", async () => {
-    await program.methods
-      .actualizarStock("Filtro de aceite", 20)
-      .accounts({
-        owner: provider.wallet.publicKey,
-        refaccionaria: pda,
-      })
-      .rpc();
-
-    console.log("Stock actualizado");
-  });
-
-  it("Ver refacciones", async () => {
-    const cuenta = await program.account.refaccionaria.fetch(pda);
-    console.log("Datos:", cuenta);
+  it("Ver motos", async () => {
+    const cuenta = await program.account.agencia.fetch(pda);
+    console.log(cuenta);
   });
 });
