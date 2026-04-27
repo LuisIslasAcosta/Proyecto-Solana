@@ -1,34 +1,56 @@
-// No imports needed: web3, anchor, pg and more are globally available
+import * as anchor from "@coral-xyz/anchor";
+import { Program } from "@coral-xyz/anchor";
 
-describe("Test", () => {
-  it("initialize", async () => {
-    // Generate keypair for the new account
-    const newAccountKp = new web3.Keypair();
+describe("Refaccionaria", () => {
+  const provider = anchor.AnchorProvider.env();
+  anchor.setProvider(provider);
 
-    // Send transaction
-    const data = new BN(42);
-    const txHash = await pg.program.methods
-      .initialize(data)
+  const program = anchor.workspace.Refaccionaria as Program;
+
+  const [pda] = anchor.web3.PublicKey.findProgramAddressSync(
+    [Buffer.from("refaccionaria"), provider.wallet.publicKey.toBuffer()],
+    program.programId
+  );
+
+  it("Crear refaccionaria", async () => {
+    await program.methods
+      .crearRefaccionaria("Refaccionaria Lopez")
       .accounts({
-        newAccount: newAccountKp.publicKey,
-        signer: pg.wallet.publicKey,
-        systemProgram: web3.SystemProgram.programId,
+        owner: provider.wallet.publicKey,
+        refaccionaria: pda,
+        systemProgram: anchor.web3.SystemProgram.programId,
       })
-      .signers([newAccountKp])
       .rpc();
-    console.log(`Use 'solana confirm -v ${txHash}' to see the logs`);
 
-    // Confirm transaction
-    await pg.connection.confirmTransaction(txHash);
+    console.log("Refaccionaria creada");
+  });
 
-    // Fetch the created account
-    const newAccount = await pg.program.account.newAccount.fetch(
-      newAccountKp.publicKey
-    );
+  it("Agregar refaccion", async () => {
+    await program.methods
+      .agregarRefaccion("Filtro de aceite", 200, 10)
+      .accounts({
+        owner: provider.wallet.publicKey,
+        refaccionaria: pda,
+      })
+      .rpc();
 
-    console.log("On-chain data is:", newAccount.data.toString());
+    console.log("Refaccion agregada");
+  });
 
-    // Check whether the data on-chain is equal to local 'data'
-    assert(data.eq(newAccount.data));
+  it("Actualizar stock", async () => {
+    await program.methods
+      .actualizarStock("Filtro de aceite", 20)
+      .accounts({
+        owner: provider.wallet.publicKey,
+        refaccionaria: pda,
+      })
+      .rpc();
+
+    console.log("Stock actualizado");
+  });
+
+  it("Ver refacciones", async () => {
+    const cuenta = await program.account.refaccionaria.fetch(pda);
+    console.log("Datos:", cuenta);
   });
 });
