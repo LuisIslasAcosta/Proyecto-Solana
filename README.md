@@ -23,6 +23,9 @@ Cada motocicleta cuenta con:
 * Activar o desactivar disponibilidad
 * Consultar inventario
 
+## Declare_id
+**5ZjpnkFbwAaMJonsW7MmcwGzsBwzKRuQ2NJ7SYTAL5hM**
+
 ## Tecnologías
 
 * Rust
