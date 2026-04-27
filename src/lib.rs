@@ -157,7 +157,7 @@ pub struct NuevaAgencia<'info> {
         init,
         payer = owner,
         space = Agencia::INIT_SPACE + 8,
-        seeds = [b"agencia", owner.key().as_ref()],
+        seeds = [b"agenci", owner.key().as_ref()],
         bump
     )]
     pub agencia: Account<'info, Agencia>,

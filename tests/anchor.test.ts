@@ -33,7 +33,7 @@ describe("Motocicletas", () => {
       .rpc();
   });
 
-  it("Ver moto", async () => {
+  it("Ver motos", async () => {
     const cuenta = await program.account.agencia.fetch(pda);
     console.log(cuenta);
   });
