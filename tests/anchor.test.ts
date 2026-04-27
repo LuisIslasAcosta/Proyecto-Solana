@@ -4,7 +4,7 @@ Aplicación descentralizada desarrollada en Solana utilizando Rust y Anchor.
 
 ## Descripción
 
-Este proyecto simula la gestión de una agencia de motocicletas en blockchain, donde se pueden realizar operaciones CRUD para administrar un inventario.
+Este proyecto simula la gestión de una agencia de motocicletas en blockchain, donde se pueden realizar operaciones CRUD para administrar y gestionar un inventario.
 
 Cada motocicleta cuenta con:
 
