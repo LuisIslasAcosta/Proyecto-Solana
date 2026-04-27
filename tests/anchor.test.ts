@@ -1,59 +1,40 @@
-# Agencia de Motocicletas en Solana
+import * as anchor from "@coral-xyz/anchor";
+import { Program } from "@coral-xyz/anchor";
 
-Aplicación descentralizada desarrollada en Solana utilizando Rust y Anchor.
+describe("Motocicletas", () => {
+  const provider = anchor.AnchorProvider.env();
+  anchor.setProvider(provider);
 
-## Descripción
+  const program = anchor.workspace.Motocicletas as Program;
 
-Este proyecto simula la gestión de una agencia de motocicletas en blockchain, donde se pueden realizar operaciones CRUD para administrar y gestionar un inventario.
+  const [pda] = anchor.web3.PublicKey.findProgramAddressSync(
+    [Buffer.from("agencia"), provider.wallet.publicKey.toBuffer()],
+    program.programId
+  );
 
-Cada motocicleta cuenta con:
+  it("Crear agencia", async () => {
+    await program.methods
+      .crearAgencia("Agencia Motos")
+      .accounts({
+        owner: provider.wallet.publicKey,
+        agencia: pda,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
+  });
 
-* Modelo
-* Marca
-* Precio
-* Stock
-* Estado (disponible o no disponible)
+  it("Agregar moto", async () => {
+    await program.methods
+      .agregarMoto("R15", "Yamaha", 50000, 5)
+      .accounts({
+        owner: provider.wallet.publicKey,
+        agencia: pda,
+      })
+      .rpc();
+  });
 
-## Funcionalidades
-
-* Crear agencia
-* Agregar motocicletas
-* Eliminar motocicletas
-* Actualizar stock
-* Activar o desactivar disponibilidad
-* Consultar inventario
-
-## Tecnologías
-
-* Rust
-* Anchor
-* Solana
-
-## Desarrollo
-
-El proyecto fue desarrollado en local utilizando Kali Linux en mi laptop.
-Los despliegues y pruebas se realizaron desde Solana Playground: https://beta.solpg.io/
-
-## Uso en Solana Playground
-
-Para correr el proyecto desde Playground:
-
-1. Ir a la pestaña **Test**
-
-2. Para crear la agencia:
-
-   * Ingresar el **nombre (String)**
-   * En la cuenta seleccionar:
-
-     * From Seed
-     * Public Key
-     * Current Wallet
-   * Ejecutar la función para crear la agencia
-
-3. Para trabajar con motocicletas:
-
-   * Llenar los datos requeridos (modelo, marca, precio, stock)
-   * Usar la misma configuración de cuenta que la agencia
-   * Utilizar el mismo **Public Key de la agencia (PDA)**
-
-Con esto ya se pueden ejecutar todas las funciones del sistema.
+  it("Ver motos", async () => {
+    const cuenta = await program.account.agencia.fetch(pda);
+    console.log(cuenta);
+  });
+});
